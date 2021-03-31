@@ -5,14 +5,55 @@ WIDTH, HEIGHT = 500, 500
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Crate")
 FPS = 60
-VEL = 10
+VEL = 50
 
-TRUCK_IMAGE = pygame.image.load(os.path.join('Assets', 'truck.png'))
+
+TRUCK_RIGHT_IMAGE = pygame.image.load(os.path.join('Assets', 'truck.png'))
+TRUCK_LEFT_IMAGE = pygame.image.load(os.path.join('Assets', 'truck_2.png'))
+# TRASH_IMAGE = pygame.image.load(os.path.join('Assets', 'trash.png'))
+# GRASS_IMAGE = pygame.image.load(os.path.join('Assets', 'grass.png'))
+
 TRUCK_WIDTH, TRUCK_HEIGHT = 31, 15
-TRUCK = pygame.transform.scale(TRUCK_IMAGE, (TRUCK_WIDTH, TRUCK_HEIGHT))
+TRUCK_RIGHT = pygame.transform.scale(TRUCK_RIGHT_IMAGE, (TRUCK_WIDTH, TRUCK_HEIGHT))
+TRUCK_LEFT = pygame.transform.scale(TRUCK_LEFT_IMAGE, (TRUCK_WIDTH, TRUCK_HEIGHT))
+
+# GRASS_WIDTH, GRASS_HEIGHT = 50, 50
+# GRASS = pygame.transform.scale(GRASS_IMAGE, (GRASS_WIDTH, GRASS_HEIGHT))
+
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+
+mapElements = []
+
+
+def check_if_position_empty(position):
+    for i in mapElements:
+        if i.position == position:
+            return False
+        return True
+
+
+# def add_bins():
+#     for i in range(0, ):
+#         rightPosition = False
+#         while not rightPosition:
+#             x = randint(0, )
+#             y = randint(0,)
+#             if checkIfPositionEmpty([x,y]):
+#                 rightPosition = True
+#         element = Trash(x, y)
+#         mapElements.append(element)
+#         # dodac do gridu
+#
+# def add_grass():
+#     for i in range (0, WIDTH ):
+#         for j in range (0, HEIGHT):
+#             if checkIfPositionEmpty([i.j]):
+#                 element =
+#                 mapElements.append(element)
+#                 # dodac do gridu
+#
 
 
 def draw_grid():
@@ -23,39 +64,42 @@ def draw_grid():
             pygame.draw.rect(WIN, BLACK, rect, 1)
 
 
-def draw_window(truck):
+def draw_window(truck, photo):
     WIN.fill(WHITE)
     draw_grid()
-    WIN.blit(TRUCK, (truck.x, truck.y))
+    WIN.blit(photo, (truck.x, truck.y))
+
     pygame.display.update()
 
 
-def truck_movement(keys_pressed, truck):
-    if keys_pressed[pygame.K_LEFT] and truck.x - VEL > 0:
+def truck_movement(event, truck):
+    if event.key == pygame.K_LEFT and truck.x - VEL > 0:
         truck.x -= VEL
-    if keys_pressed[pygame.K_RIGHT] and truck.x + VEL < WIDTH - TRUCK.get_width():
+        draw_window(truck, TRUCK_LEFT)
+    if event.key == pygame.K_RIGHT and truck.x + VEL < WIDTH - TRUCK_RIGHT.get_width():
         truck.x += VEL
-    if keys_pressed[pygame.K_UP] and truck.y - VEL > 0:
+        draw_window(truck, TRUCK_RIGHT)
+    if event.key == pygame.K_UP and truck.y - VEL > 0:
         truck.y -= VEL
-    if keys_pressed[pygame.K_DOWN] and truck.y + VEL < HEIGHT - TRUCK.get_height():
+        draw_window(truck, TRUCK_RIGHT)
+    if event.key == pygame.K_DOWN and truck.y + VEL < HEIGHT - TRUCK_RIGHT.get_height():
         truck.y += VEL
+        draw_window(truck, TRUCK_RIGHT)
 
 
 def main():
-    truck = pygame.Rect(10, 10, TRUCK_WIDTH, TRUCK_HEIGHT)
-
+    truck = pygame.Rect(10, 15, TRUCK_WIDTH, TRUCK_HEIGHT)
     clock = pygame.time.Clock()
+
     run = True
     while run:
         clock.tick(FPS)
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 run = False
-
-        keys_pressed = pygame.key.get_pressed()
-        truck_movement(keys_pressed, truck)
-
-        draw_window(truck)
+            if event.type == pygame.KEYDOWN:
+                truck_movement(event, truck)
 
     pygame.quit()
 
