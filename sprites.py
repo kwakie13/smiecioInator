@@ -3,7 +3,7 @@ import time
 
 import pygame as pg
 
-from graph_search import *
+from searching import *
 from variables import *
 
 
