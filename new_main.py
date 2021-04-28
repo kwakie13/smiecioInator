@@ -24,6 +24,7 @@ class Game:
         self.all_sprites = pygame.sprite.Group()
         self.borders = pygame.sprite.Group()
         self.houses = pygame.sprite.Group()
+        self.holes = pygame.sprite.Group()
         for row, tiles in enumerate(self.map_data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
@@ -34,7 +35,8 @@ class Game:
                     House(self, col, row)
                 if tile == 'R':
                     self.trash = Trash(self, col, row)
-
+                if tile == 'O':
+                    Hole(self, col, row)
 
     def run(self):  # game loop
         self.playing = True
@@ -76,15 +78,22 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     self.quit()
                 if event.key == pygame.K_LEFT:
-                    self.truck.move(dx=-1)
+                    self.truck.rotate(direction=-1)
                 if event.key == pygame.K_RIGHT:
-                    self.truck.move(dx=1)
+                    self.truck.rotate(direction=1)
                 if event.key == pygame.K_UP:
-                    self.truck.move(dy=-1)
-                if event.key == pygame.K_DOWN:
-                    self.truck.move(dy=1)
+                    self.truck.move(rotation=self.truck.rotation)
+                if event.key == pygame.K_a:
+                    self.truck.start_search(self.trash, 1)
+                    self.truck.move_truck()
+                    pygame.event.clear()
+                if event.key == pygame.K_b:
+                    self.truck.start_search(self.trash, 2)
+                    self.truck.move_truck()
+                    pygame.event.clear()
+
             if self.truck.x == self.trash.x and self.truck.y == self.trash.y:
-                self.trash.change_details()
+                self.trash.change_details()  # randomizing new trash position and type
 
 
 g = Game()
