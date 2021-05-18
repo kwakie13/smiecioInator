@@ -1,5 +1,6 @@
-from sprites import *
 from queue import PriorityQueue
+
+from variables import *
 
 
 class Search:
@@ -174,7 +175,7 @@ class Search:
             a.cost += a.parent.cost
             for hole in self.holes:
                 if hole.x == a.state.x and hole.y == a.state.y:
-                    a.cost += 100
+                    a.cost += HOLE_COST
         return a.cost + distance_manhattan
 
 
@@ -190,7 +191,7 @@ class Node:
 
 
 class State:
-    def __init__(self, x, y, rotation, cost=1):
+    def __init__(self, x, y, rotation, cost=REGULAR_COST):
         self.x = x
         self.y = y
         self.rotation = rotation

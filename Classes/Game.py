@@ -1,7 +1,10 @@
-import pygame
 import sys
 from os import path
-from sprites import *
+
+import pygame
+
+from Classes import Border, Hole, House, Trash, Truck
+from variables import *
 
 
 class Game:
@@ -16,7 +19,7 @@ class Game:
     def load_data(self):
         game_folder = path.dirname(__file__)
         self.map_data = []
-        with open(path.join(game_folder, 'map.txt'), 'rt') as file:
+        with open(path.join(game_folder, '../Assets/map.txt'), 'rt') as file:
             for line in file:
                 self.map_data.append(line)
 
@@ -28,15 +31,15 @@ class Game:
         for row, tiles in enumerate(self.map_data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
-                    Border(self, col, row)
+                    Border.Border(self, col, row)
                 if tile == 'T':
-                    self.truck = Truck(self, col, row)
+                    self.truck = Truck.Truck(self, col, row)
                 if tile == 'H':
-                    House(self, col, row)
+                    House.House(self, col, row)
                 if tile == 'R':
-                    self.trash = Trash(self, col, row)
+                    self.trash = Trash.Trash(self, col, row)
                 if tile == 'O':
-                    Hole(self, col, row)
+                    Hole.Hole(self, col, row)
 
     def run(self):  # game loop
         self.playing = True
@@ -54,9 +57,9 @@ class Game:
         self.all_sprites.update()
 
     def draw_grid(self):
-        for x in range(0, WIDTH, TILESIZE):
+        for x in range(0, WIDTH, TILE_SIZE):
             pygame.draw.line(self.screen, GREY, (x, 0), (x, HEIGHT))
-        for y in range(0, HEIGHT, TILESIZE):
+        for y in range(0, HEIGHT, TILE_SIZE):
             pygame.draw.line(self.screen, GREY, (0, y), (WIDTH, y))
 
     def draw_missing_borders(self):
@@ -64,7 +67,7 @@ class Game:
         pygame.draw.line(self.screen, GREY, (64, 640), (640, 640))
 
     def draw(self):
-        self.screen.fill(BGCOLOR)
+        self.screen.fill(BG_COLOR)
         self.draw_grid()
         self.all_sprites.draw(self.screen)
         self.draw_missing_borders()
@@ -83,20 +86,14 @@ class Game:
                     self.truck.rotate(direction=1)
                 if event.key == pygame.K_UP:
                     self.truck.move(rotation=self.truck.rotation)
-                if event.key == pygame.K_a:
+                if event.key == pygame.K_a:  # run A*
                     self.truck.start_search(self.trash, 1)
                     self.truck.move_truck()
                     pygame.event.clear()
-                if event.key == pygame.K_b:
+                if event.key == pygame.K_b:  # run BFS
                     self.truck.start_search(self.trash, 2)
                     self.truck.move_truck()
                     pygame.event.clear()
 
             if self.truck.x == self.trash.x and self.truck.y == self.trash.y:
                 self.trash.change_details()  # randomizing new trash position and type
-
-
-g = Game()
-while True:
-    g.new()
-    g.run()
