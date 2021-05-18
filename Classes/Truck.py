@@ -12,12 +12,12 @@ class Truck(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILE_SIZE, TILE_SIZE))
-        self.image.fill(BLACK)
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
         self.rotation = 0  # 0 - right, 1 - down, 2 - left, 3 - up
         self.move_list = []
+        self.truck_image(self.rotation)
 
     def move(self, rotation=0):
         if not self.collision(rotation):
@@ -64,6 +64,7 @@ class Truck(pg.sprite.Sprite):
     def update(self):
         self.rect.x = self.x * TILE_SIZE
         self.rect.y = self.y * TILE_SIZE
+        self.truck_image(self.rotation)
 
     def start_search(self, trash, search_type=1):
         goal = [Searching.State(trash.x, trash.y, 0), Searching.State(trash.x, trash.y, 1),
@@ -91,3 +92,6 @@ class Truck(pg.sprite.Sprite):
             time.sleep(0.3)
 
         self.move_list = []
+
+    def truck_image(self, rotation=0):
+        self.image = pg.image.load(TRUCK_PICS[rotation])

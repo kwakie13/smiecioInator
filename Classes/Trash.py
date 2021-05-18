@@ -46,8 +46,8 @@ class Trash(pg.sprite.Sprite):
 
     def random_type(self):
         random_num = random.randint(0, 3)
-        new_type = TYPES_COLOR[TYPES_DICT[random_num]]
-        self.image.fill(new_type)
+        new_type = TYPES_PICS[TYPES_DICT[random_num]]
+        self.image = pg.image.load(new_type)
 
     def update(self):
         self.rect.x = self.x * TILE_SIZE

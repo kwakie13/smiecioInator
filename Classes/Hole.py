@@ -9,7 +9,8 @@ class Hole(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILE_SIZE, TILE_SIZE))
-        self.image.fill(MEDIUM_GREY)
+        self.image = pg.image.load('./assets/hole_big.png')
+        self.image = pg.transform.scale(self.image, (64, 64))
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y

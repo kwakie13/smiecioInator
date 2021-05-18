@@ -1,3 +1,4 @@
+import random
 import sys
 from os import path
 
@@ -28,18 +29,21 @@ class Game:
         self.borders = pygame.sprite.Group()
         self.houses = pygame.sprite.Group()
         self.holes = pygame.sprite.Group()
+        var_x, var_y = 0, 0
         for row, tiles in enumerate(self.map_data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
                     Border.Border(self, col, row)
-                if tile == 'T':
-                    self.truck = Truck.Truck(self, col, row)
                 if tile == 'H':
-                    House.House(self, col, row)
-                if tile == 'R':
-                    self.trash = Trash.Trash(self, col, row)
+                    House.House(self, col, row, random.randint(0, 2))
                 if tile == 'O':
                     Hole.Hole(self, col, row)
+                if tile == 'R':
+                    self.trash = Trash.Trash(self, col, row)
+                if tile == 'T':
+                    var_x, var_y = col, row
+
+        self.truck = Truck.Truck(self, var_x, var_y)
 
     def run(self):  # game loop
         self.playing = True
@@ -63,8 +67,8 @@ class Game:
             pygame.draw.line(self.screen, GREY, (0, y), (WIDTH, y))
 
     def draw_missing_borders(self):
-        pygame.draw.line(self.screen, GREY, (640, 64), (640, 640))
-        pygame.draw.line(self.screen, GREY, (64, 640), (640, 640))
+        pygame.draw.line(self.screen, GREY, (704, 64), (704, 704))
+        pygame.draw.line(self.screen, GREY, (64, 704), (704, 704))
 
     def draw(self):
         self.screen.fill(BG_COLOR)
