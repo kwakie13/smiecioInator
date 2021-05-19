@@ -126,6 +126,7 @@ class Game:
                         print("Go to dump, free the truck!\n")
                     elif self.made_decision[0] == 1:
                         print("Go to trash, pick it up!\n")
+                    pygame.event.clear()
 
                 # if event.key == pygame.K_g:
                 #     if self.made_decision[0] == 0:
@@ -146,6 +147,8 @@ class Game:
                         tree.save_tree_to_structure(gen_tree)
                         self.decision_tree = tree.load_tree_from_structure('./DecisionTree/tree_model')
                         print("Tree model created!\n")
+
+                    pygame.event.clear()
 
             if self.truck.x == self.trash.x and self.truck.y == self.trash.y:
                 self.truck.mass += self.trash.mass
