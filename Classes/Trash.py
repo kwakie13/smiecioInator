@@ -1,20 +1,23 @@
 import random
 
-import pygame as pg
+import pygame
 
 from variables import *
 
 
-class Trash(pg.sprite.Sprite):
+class Trash(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
-        pg.sprite.Sprite.__init__(self, self.groups)
+        pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILE_SIZE, TILE_SIZE))
+
+        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.random_type()
+
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
+
         self.mass = None
         self.space = None
         self.random_size()
@@ -51,7 +54,7 @@ class Trash(pg.sprite.Sprite):
     def random_type(self):
         random_num = random.randint(0, 3)
         new_type = TYPES_PICS[TYPES_DICT[random_num]]
-        self.image = pg.image.load(new_type)
+        self.image = pygame.image.load(new_type)
 
     def random_size(self):
         self.mass = random.randint(0, 25)

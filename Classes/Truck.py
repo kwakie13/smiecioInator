@@ -11,13 +11,17 @@ class Truck(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILE_SIZE, TILE_SIZE))
-        self.rect = self.image.get_rect()
+
         self.x = x
         self.y = y
         self.rotation = 0  # 0 - right, 1 - down, 2 - left, 3 - up
-        self.move_list = []
+
+        self.image = pg.Surface((TILE_SIZE, TILE_SIZE))
         self.truck_image(self.rotation)
+        self.rect = self.image.get_rect()
+
+        self.move_list = []
+
         self.mass = 0
         self.space = 0
 
@@ -75,9 +79,9 @@ class Truck(pg.sprite.Sprite):
         searching_object = Searching.Search(istate, goal, self.game.borders, self.game.houses, self.game.holes)
 
         if search_type == 1:
-            self.move_list = searching_object.search_aStar()
+            self.move_list = searching_object.search_a_star()
         else:
-            self.move_list = searching_object.search()
+            self.move_list = searching_object.search_BFS()
 
         return searching_object.end_cost
 

@@ -1,15 +1,17 @@
-import pygame as pg
+import pygame
 
 from variables import *
 
 
-class Border(pg.sprite.Sprite):
+class Border(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.borders
-        pg.sprite.Sprite.__init__(self, self.groups)
+        pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILE_SIZE, TILE_SIZE))
+
+        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.image.fill(DARKGREY)
+
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
