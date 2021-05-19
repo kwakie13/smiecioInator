@@ -28,6 +28,12 @@ def making_decision(decision_tree, distance_to_bin, distance_to_trash, filling_m
     return decision
 
 
+def save_all(decision_tree):
+    save_tree_to_png(decision_tree)
+    save_tree_to_txt(decision_tree)
+    save_tree_to_structure(decision_tree)
+
+
 def save_tree_to_txt(decision_tree):
     with open('./DecisionTree/tree_in_txt.txt', "w") as file:
         file.write(tree.export_text(decision_tree))

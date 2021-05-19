@@ -12,7 +12,7 @@ class Search:
         self.holes = holes
         self.end_cost = None
 
-    def search_aStar(self):  # A*
+    def search_a_star(self):  # A*
         start_node = Node(self.istate)
 
         if self.goal_test(start_node.state):
@@ -20,6 +20,7 @@ class Search:
 
         fringe = PriorityQueue()
         fringe.put((0, start_node))
+
         action_list = []
         explored = []
 
@@ -28,7 +29,8 @@ class Search:
             explored.append(current_node.state)  # adding node where we currently are to visited ones
 
             if self.goal_test(current_node.state):
-                self.end_cost = current_node.cost
+                self.end_cost = current_node.cost  # remembering found best route cost
+
                 while current_node.parent is not None:
                     action_list.append(current_node.action)
                     current_node = current_node.parent
@@ -44,6 +46,7 @@ class Search:
 
                 if self.no_node_in_list_for_queue(successor, fringe) and self.no_state_in_list(successor.state, explored):
                     fringe.put((power, successor))
+
                 elif not self.no_node_in_list_for_queue(successor, fringe):  # if node is present in fringe
                     return_node, index = self.node_list_state_test_values(successor, fringe)
 
@@ -58,7 +61,7 @@ class Search:
                         for j in range(index - 1):
                             fringe.put(temp_queue.get())
 
-    def search(self):
+    def search_BFS(self):
         start_node = Node(self.istate)
 
         if self.goal_test(start_node.state):
@@ -71,6 +74,7 @@ class Search:
         while fringe:
             current_node = fringe.pop(0)
             explored.append(current_node.state)
+
             if self.goal_test(current_node.state):
                 while current_node.parent is not None:
                     action_list.append(current_node.action)
@@ -88,30 +92,40 @@ class Search:
     def goal_test(self, state):  # if state is in the states list = goal achieved
         if not self.no_state_in_list(state, self.goal):
             return True
+
         return False
 
-    def no_node_in_list(self, node_to_check, test_node_list):
+    @staticmethod
+    def no_node_in_list(node_to_check, test_node_list):
         for node in test_node_list:
             if node.state.x == node_to_check.state.x and node.state.y == node_to_check.state.y and node.state.rotation == node_to_check.state.rotation:
                 return False
+
         return True
 
-    def no_node_in_list_for_queue(self, node_to_check, test_node_list):
+    @staticmethod
+    def no_node_in_list_for_queue(node_to_check, test_node_list):
         for node in test_node_list.queue:
             if node[1].state.x == node_to_check.state.x and node[1].state.y == node_to_check.state.y and node[1].state.rotation == node_to_check.state.rotation:
                 return False
+
         return True
 
-    def no_state_in_list(self, state_to_check, state_list):
+    @staticmethod
+    def no_state_in_list(state_to_check, state_list):
         for state in state_list:
             if state.x == state_to_check.x and state.y == state_to_check.y and state.rotation == state_to_check.rotation:
                 return False
+
         return True
 
-    def node_list_state_test_values(self, test_node, test_node_list):
+    @staticmethod
+    def node_list_state_test_values(test_node, test_node_list):
         i = 0
+
         for node in test_node_list.queue:
             i += 1
+
             if node[1].state.x == test_node.state.x and node[1].state.y == test_node.state.y and node[1].state.rotation == test_node.state.rotation:
                 return node, i
 
@@ -173,11 +187,14 @@ class Search:
 
     def heuristic(self, a, b):
         distance_manhattan = abs(a.state.x - b.x) + abs(a.state.y - b.y)
+
         if a.parent is not None:
             a.cost += a.parent.cost
+
             for hole in self.holes:
                 if hole.x == a.state.x and hole.y == a.state.y:
                     a.cost += HOLE_COST
+
         return a.cost + distance_manhattan
 
 

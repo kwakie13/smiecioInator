@@ -17,11 +17,31 @@ class Game:
         pygame.display.set_caption(WINDOW_TITLE)
         self.clock = pygame.time.Clock()
         pygame.key.set_repeat(500, 100)
+
+        self.playing = True
+        self.dt = None
+
+        self.all_sprites = None
+        self.borders = None
+        self.houses = None
+        self.holes = None
+
+        self.dump = None
+        self.trash = None
+        self.truck = None
+
+        self.map_data = []
+
+        self.distance_to_dump = None
+        self.distance_to_trash = None
+
+        self.decision_tree = None
+        self.made_decision = []
+
         self.load_data()
 
     def load_data(self):
         game_folder = path.dirname(__file__)
-        self.map_data = []
         with open(path.join(game_folder, '../Assets/map.txt'), 'rt') as file:
             for line in file:
                 self.map_data.append(line)
@@ -32,6 +52,7 @@ class Game:
         self.houses = pygame.sprite.Group()
         self.holes = pygame.sprite.Group()
         var_x, var_y = 0, 0
+
         for row, tiles in enumerate(self.map_data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
@@ -50,14 +71,14 @@ class Game:
         self.truck = Truck.Truck(self, var_x, var_y)
 
     def run(self):  # game loop
-        self.playing = True
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
             self.update()
             self.draw()
 
-    def quit(self):
+    @staticmethod
+    def quit():
         pygame.quit()
         sys.exit()
 
@@ -85,6 +106,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit()
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.quit()
@@ -108,8 +130,26 @@ class Game:
                     self.truck.move_truck()
                     pygame.event.clear()
 
+                if event.key == pygame.K_l:  # learn the tree
+                    if path.isfile('./DecisionTree/tree_model') and not os.stat(
+                            './DecisionTree/tree_model').st_size == 0:
+                        self.decision_tree = tree.load_tree_from_structure('./DecisionTree/tree_model')
+                        print("Tree model already exists!\n")
+
+                    else:
+                        gen_tree = tree.learning_tree()
+                        tree.save_all(gen_tree)
+                        self.decision_tree = tree.load_tree_from_structure('./DecisionTree/tree_model')
+                        print("Tree model created!\n")
+
+                    pygame.event.clear()
+
                 if event.key == pygame.K_d:  # decision tree
-                    self.distance_to_dump = self.truck.start_search(self.dump, 1)
+                    if self.truck.x == self.dump.x and self.truck.y == self.dump.y:
+                        self.distance_to_dump = 1
+                    else:
+                        self.distance_to_dump = self.truck.start_search(self.dump, 1)
+
                     self.distance_to_trash = self.truck.start_search(self.trash, 1)
 
                     print(
@@ -117,36 +157,31 @@ class Game:
                             self.distance_to_dump, self.distance_to_trash, self.truck.mass, self.truck.space,
                             self.trash.mass, self.trash.space))
 
-                    self.made_decision = tree.making_decision(self.decision_tree, self.distance_to_dump,
-                                                              self.distance_to_trash, self.truck.mass // 20 + 1,
-                                                              self.truck.space // 20 + 1, self.trash.mass // 20 + 1,
-                                                              self.trash.space // 20 + 1)
+                    if self.distance_to_dump == 1:
+                        self.made_decision = []
+                        self.made_decision.append(1)
+                    else:
+                        self.made_decision = tree.making_decision(self.decision_tree, self.distance_to_dump // 40 + 1,
+                                                                  self.distance_to_trash // 40 + 1,
+                                                                  self.truck.mass // 20 + 1,
+                                                                  self.truck.space // 20 + 1, self.trash.mass // 20 + 1,
+                                                                  self.trash.space // 20 + 1)
 
                     if self.made_decision[0] == 0:
                         print("Go to dump, free the truck!\n")
+
+                        self.truck.start_search(self.dump, 1)
+                        self.truck.move_truck()
+
+                        pygame.event.clear()
+
                     elif self.made_decision[0] == 1:
                         print("Go to trash, pick it up!\n")
-                    pygame.event.clear()
 
-                # if event.key == pygame.K_g:
-                #     if self.made_decision[0] == 0:
-                #         self.truck.start_search(self.dump, 1)
-                #
-                #     self.truck.move_truck()
-                #     pygame.event.clear()
+                        self.truck.start_search(self.trash, 1)
+                        self.truck.move_truck()
 
-                if event.key == pygame.K_l:  # learn the tree
-                    if path.isfile('./DecisionTree/tree_model') and not os.stat(
-                            './DecisionTree/tree_model').st_size == 0:
-                        self.decision_tree = tree.load_tree_from_structure('./DecisionTree/tree_model')
-                        print("Tree model already exists!\n")
-                    else:
-                        gen_tree = tree.learning_tree()
-                        tree.save_tree_to_txt(gen_tree)
-                        tree.save_tree_to_png(gen_tree)
-                        tree.save_tree_to_structure(gen_tree)
-                        self.decision_tree = tree.load_tree_from_structure('./DecisionTree/tree_model')
-                        print("Tree model created!\n")
+                        pygame.event.clear()
 
                     pygame.event.clear()
 
@@ -155,6 +190,6 @@ class Game:
                 self.truck.space += self.trash.space
                 self.trash.change_details()
 
-            if self.truck.x == self.dump.x and self.truck.x == self.dump.y and self.truck.mass > 0 and self.truck.space > 0:
+            if self.truck.x == self.dump.x and self.truck.y == self.dump.y and self.truck.mass > 0 and self.truck.space > 0:
                 self.truck.mass = 0
                 self.truck.space = 0
