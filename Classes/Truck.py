@@ -18,6 +18,8 @@ class Truck(pg.sprite.Sprite):
         self.rotation = 0  # 0 - right, 1 - down, 2 - left, 3 - up
         self.move_list = []
         self.truck_image(self.rotation)
+        self.mass = 0
+        self.space = 0
 
     def move(self, rotation=0):
         if not self.collision(rotation):
@@ -66,9 +68,9 @@ class Truck(pg.sprite.Sprite):
         self.rect.y = self.y * TILE_SIZE
         self.truck_image(self.rotation)
 
-    def start_search(self, trash, search_type=1):
-        goal = [Searching.State(trash.x, trash.y, 0), Searching.State(trash.x, trash.y, 1),
-                Searching.State(trash.x, trash.y, 2), Searching.State(trash.x, trash.y, 3)]
+    def start_search(self, destination, search_type=1):
+        goal = [Searching.State(destination.x, destination.y, 0), Searching.State(destination.x, destination.y, 1),
+                Searching.State(destination.x, destination.y, 2), Searching.State(destination.x, destination.y, 3)]
         istate = Searching.State(self.x, self.y, self.rotation)
         searching_object = Searching.Search(istate, goal, self.game.borders, self.game.houses, self.game.holes)
 
@@ -76,6 +78,8 @@ class Truck(pg.sprite.Sprite):
             self.move_list = searching_object.search_aStar()
         else:
             self.move_list = searching_object.search()
+
+        return searching_object.end_cost
 
     def move_truck(self):
         for move in self.move_list:
@@ -88,7 +92,7 @@ class Truck(pg.sprite.Sprite):
 
             self.update()
             self.game.draw()
-            time.sleep(0.3)
+            time.sleep(0.1)
 
         self.move_list = []
 

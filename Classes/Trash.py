@@ -15,6 +15,9 @@ class Trash(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
+        self.mass = None
+        self.space = None
+        self.random_size()
 
     def change_details(self):
         bad_coordinates = True
@@ -32,6 +35,7 @@ class Trash(pg.sprite.Sprite):
         self.x = rand_x
         self.y = rand_y
         self.random_type()
+        self.random_size()
 
     def collision(self, x, y):
         for border in self.game.borders:
@@ -48,6 +52,10 @@ class Trash(pg.sprite.Sprite):
         random_num = random.randint(0, 3)
         new_type = TYPES_PICS[TYPES_DICT[random_num]]
         self.image = pg.image.load(new_type)
+
+    def random_size(self):
+        self.mass = random.randint(0, 25)
+        self.space = random.randint(0, 25)
 
     def update(self):
         self.rect.x = self.x * TILE_SIZE

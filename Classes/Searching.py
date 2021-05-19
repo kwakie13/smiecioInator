@@ -28,7 +28,6 @@ class Search:
             explored.append(current_node.state)  # adding node where we currently are to visited ones
 
             if self.goal_test(current_node.state):
-                print(current_node.cost)
                 self.end_cost = current_node.cost
                 while current_node.parent is not None:
                     action_list.append(current_node.action)

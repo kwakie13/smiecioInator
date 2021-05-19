@@ -1,10 +1,12 @@
+import os
 import random
 import sys
 from os import path
 
 import pygame
 
-from Classes import Border, Hole, House, Trash, Truck
+from Classes import Border, Hole, House, Trash, Truck, Dump
+from DecisionTree import tree
 from variables import *
 
 
@@ -38,6 +40,8 @@ class Game:
                     House.House(self, col, row, random.randint(0, 2))
                 if tile == 'O':
                     Hole.Hole(self, col, row)
+                if tile == 'D':
+                    self.dump = Dump.Dump(self, col, row)
                 if tile == 'R':
                     self.trash = Trash.Trash(self, col, row)
                 if tile == 'T':
@@ -84,20 +88,70 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.quit()
+
                 if event.key == pygame.K_LEFT:
                     self.truck.rotate(direction=-1)
+
                 if event.key == pygame.K_RIGHT:
                     self.truck.rotate(direction=1)
+
                 if event.key == pygame.K_UP:
                     self.truck.move(rotation=self.truck.rotation)
+
                 if event.key == pygame.K_a:  # run A*
                     self.truck.start_search(self.trash, 1)
                     self.truck.move_truck()
                     pygame.event.clear()
+
                 if event.key == pygame.K_b:  # run BFS
                     self.truck.start_search(self.trash, 2)
                     self.truck.move_truck()
                     pygame.event.clear()
 
+                if event.key == pygame.K_d:  # decision tree
+                    self.distance_to_dump = self.truck.start_search(self.dump, 1)
+                    self.distance_to_trash = self.truck.start_search(self.trash, 1)
+
+                    print(
+                        "Dump distance: {0}\nTrash distance: {1}\nTruck filled (mass): {2}\nTruck filled (space): {3}\nTrash mass: {4}\nTrash volume: {5}".format(
+                            self.distance_to_dump, self.distance_to_trash, self.truck.mass, self.truck.space,
+                            self.trash.mass, self.trash.space))
+
+                    self.made_decision = tree.making_decision(self.decision_tree, self.distance_to_dump,
+                                                              self.distance_to_trash, self.truck.mass // 20 + 1,
+                                                              self.truck.space // 20 + 1, self.trash.mass // 20 + 1,
+                                                              self.trash.space // 20 + 1)
+
+                    if self.made_decision[0] == 0:
+                        print("Go to dump, free the truck!\n")
+                    elif self.made_decision[0] == 1:
+                        print("Go to trash, pick it up!\n")
+
+                # if event.key == pygame.K_g:
+                #     if self.made_decision[0] == 0:
+                #         self.truck.start_search(self.dump, 1)
+                #
+                #     self.truck.move_truck()
+                #     pygame.event.clear()
+
+                if event.key == pygame.K_l:  # learn the tree
+                    if path.isfile('./DecisionTree/tree_model') and not os.stat(
+                            './DecisionTree/tree_model').st_size == 0:
+                        self.decision_tree = tree.load_tree_from_structure('./DecisionTree/tree_model')
+                        print("Tree model already exists!\n")
+                    else:
+                        gen_tree = tree.learning_tree()
+                        tree.save_tree_to_txt(gen_tree)
+                        tree.save_tree_to_png(gen_tree)
+                        tree.save_tree_to_structure(gen_tree)
+                        self.decision_tree = tree.load_tree_from_structure('./DecisionTree/tree_model')
+                        print("Tree model created!\n")
+
             if self.truck.x == self.trash.x and self.truck.y == self.trash.y:
-                self.trash.change_details()  # randomizing new trash position and type
+                self.truck.mass += self.trash.mass
+                self.truck.space += self.trash.space
+                self.trash.change_details()
+
+            if self.truck.x == self.dump.x and self.truck.x == self.dump.y and self.truck.mass > 0 and self.truck.space > 0:
+                self.truck.mass = 0
+                self.truck.space = 0

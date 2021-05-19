@@ -3,13 +3,13 @@ import pygame as pg
 from variables import *
 
 
-class Hole(pg.sprite.Sprite):
+class Dump(pg.sprite.Sprite):
     def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.holes
+        self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILE_SIZE, TILE_SIZE))
-        self.image = pg.image.load('./Assets/hole_big.png')
+        self.image = pg.image.load('./Assets/bin.png')
         self.image = pg.transform.scale(self.image, (64, 64))
         self.rect = self.image.get_rect()
         self.x = x
