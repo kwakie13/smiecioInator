@@ -71,12 +71,11 @@ class Truck(pg.sprite.Sprite):
                 Searching.State(trash.x, trash.y, 2), Searching.State(trash.x, trash.y, 3)]
         istate = Searching.State(self.x, self.y, self.rotation)
         searching_object = Searching.Search(istate, goal, self.game.borders, self.game.houses, self.game.holes)
-        print("Searching started...")
+
         if search_type == 1:
             self.move_list = searching_object.search_aStar()
         else:
             self.move_list = searching_object.search()
-        print(self.move_list)
 
     def move_truck(self):
         for move in self.move_list:

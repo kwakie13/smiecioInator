@@ -31,4 +31,4 @@ TRUCK_PICS = {0: './Assets/truck_0.png', 1: './Assets/truck_1.png', 2: './Assets
 HOUSE_PICS = {0: './Assets/house_0.png', 1: './Assets/house_1.png', 2: './Assets/house_2.png'}
 
 REGULAR_COST = 1
-HOLE_COST = 100
+HOLE_COST = 25
