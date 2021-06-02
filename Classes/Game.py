@@ -135,9 +135,9 @@ class Game:
 
                 if event.key == pygame.K_l:  # load machine learning methods
                     # DECISION TREE
-                    if path.isfile('../DecisionTree/tree_model') and not os.stat(
-                            '../DecisionTree/tree_model').st_size == 0:
-                        self.decision_tree = tree.load_tree_from_structure('../DecisionTree/tree_model')
+                    if path.isfile('./DecisionTree/tree_model') and not os.stat(
+                            './DecisionTree/tree_model').st_size == 0:
+                        self.decision_tree = tree.load_tree_from_structure('./DecisionTree/tree_model')
                         print("Tree model loaded!\n")
 
                     else:
@@ -147,8 +147,8 @@ class Game:
                         print("Tree model created!\n")
 
                     # NEURAL NETWORK
-                    if path.isfile('../NeuralNetwork/network_model.pth') and not os.stat(
-                            '../NeuralNetwork/network_model.pth').st_size == 0:
+                    if path.isfile('./NeuralNetwork/network_model.pth') and not os.stat(
+                            './NeuralNetwork/network_model.pth').st_size == 0:
                         self.neural_network = network.Net()
                         network.load_network_from_structure(self.neural_network)
                         self.neural_network.eval()
@@ -209,7 +209,7 @@ class Game:
                 self.truck.space += self.trash.space
 
                 nn_result = network.result_from_network(self.neural_network, self.trash.image_path)
-                print("Trash type: {0}\nNetwork type: {1})".format(self.trash.type, nn_result))
+                print("Trash type: {0}\nNetwork type: {1}\n".format(self.trash.type, nn_result))
 
                 self.trash.change_details()
 
