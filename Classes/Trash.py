@@ -1,3 +1,4 @@
+import os
 import random
 
 import pygame
@@ -11,8 +12,9 @@ class Trash(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
 
+        self.type = str()
+        self.image_path = str()
         self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
-        self.random_type()
 
         self.rect = self.image.get_rect()
         self.x = x
@@ -20,7 +22,8 @@ class Trash(pygame.sprite.Sprite):
 
         self.mass = None
         self.space = None
-        self.random_size()
+
+        self.change_details()
 
     def change_details(self):
         bad_coordinates = True
@@ -37,7 +40,9 @@ class Trash(pygame.sprite.Sprite):
 
         self.x = rand_x
         self.y = rand_y
+
         self.random_type()
+        self.random_file()
         self.random_size()
 
     def collision(self, x, y):
@@ -49,12 +54,24 @@ class Trash(pygame.sprite.Sprite):
             if house.x == x and house.y == y:
                 return True
 
+        for hole in self.game.holes:
+            if hole.x == x and hole.y == y:
+                return True
+
         return False
 
     def random_type(self):
         random_num = random.randint(0, 3)
-        new_type = TYPES_PICS[TYPES_DICT[random_num]]
-        self.image = pygame.image.load(new_type)
+        new_type = TYPES_DICT[random_num]
+        self.type = new_type
+
+    def random_file(self):
+        pics_folder = TYPES_PICS_SETS[self.type]
+        selected_file = random.choice(os.listdir(pics_folder))
+
+        self.image_path = pics_folder + '/' + selected_file
+        self.image = pygame.image.load(self.image_path)
+        self.image = pygame.transform.scale(self.image, (64, 64))
 
     def random_size(self):
         self.mass = random.randint(0, 25)

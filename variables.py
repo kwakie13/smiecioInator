@@ -24,6 +24,8 @@ TYPES_DICT = {0: "metal", 1: "plastic", 2: "paper", 3: "glass"}
 TYPES_COLOR = {"metal": GREY, "plastic": YELLOW, "paper": BLUE, "glass": GREEN}
 TYPES_PICS = {"metal": './Assets/trash_metal.png', "plastic": './Assets/trash_plastic.png',
               "paper": './Assets/trash_paper.png', "glass": './Assets/trash_glass.png'}
+TYPES_PICS_SETS = {"metal": './Assets/test_set/metal', "plastic": './Assets/test_set/plastic',
+                   "paper": './Assets/test_set/paper', "glass": './Assets/test_set/glass'}
 
 TRUCK_PICS = {0: './Assets/truck_0.png', 1: './Assets/truck_1.png', 2: './Assets/truck_2.png',
               3: './Assets/truck_3.png'}

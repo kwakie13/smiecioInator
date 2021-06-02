@@ -1,6 +1,7 @@
 from Classes import Game
 
-g = Game.Game()
-while True:
-    g.new()
-    g.run()
+if __name__ == '__main__':
+    g = Game.Game()
+    while True:
+        g.new()
+        g.run()
