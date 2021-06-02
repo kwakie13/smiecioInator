@@ -7,6 +7,7 @@ import pygame
 
 from Classes import Border, Hole, House, Trash, Truck, Dump
 from DecisionTree import tree
+from NeuralNetwork import network
 from variables import *
 
 
@@ -37,6 +38,8 @@ class Game:
 
         self.decision_tree = None
         self.made_decision = []
+
+        self.neural_network = None
 
         self.load_data()
 
@@ -130,11 +133,12 @@ class Game:
                     self.truck.move_truck()
                     pygame.event.clear()
 
-                if event.key == pygame.K_l:  # learn the tree
-                    if path.isfile('./DecisionTree/tree_model') and not os.stat(
-                            './DecisionTree/tree_model').st_size == 0:
-                        self.decision_tree = tree.load_tree_from_structure('./DecisionTree/tree_model')
-                        print("Tree model already exists!\n")
+                if event.key == pygame.K_l:  # load machine learning methods
+                    # DECISION TREE
+                    if path.isfile('../DecisionTree/tree_model') and not os.stat(
+                            '../DecisionTree/tree_model').st_size == 0:
+                        self.decision_tree = tree.load_tree_from_structure('../DecisionTree/tree_model')
+                        print("Tree model loaded!\n")
 
                     else:
                         gen_tree = tree.learning_tree()
@@ -142,9 +146,21 @@ class Game:
                         self.decision_tree = tree.load_tree_from_structure('./DecisionTree/tree_model')
                         print("Tree model created!\n")
 
+                    # NEURAL NETWORK
+                    if path.isfile('../NeuralNetwork/network_model.pth') and not os.stat(
+                            '../NeuralNetwork/network_model.pth').st_size == 0:
+                        self.neural_network = network.Net()
+                        network.load_network_from_structure(self.neural_network)
+                        self.neural_network.eval()
+                        print("Neural network loaded!\nIts structure:\n")
+                        print(self.neural_network, "\n")
+
+                    else:
+                        print("Network invalid!\n")
+
                     pygame.event.clear()
 
-                if event.key == pygame.K_d:  # decision tree
+                if event.key == pygame.K_d:  # use decision tree
                     if self.truck.x == self.dump.x and self.truck.y == self.dump.y:
                         self.distance_to_dump = 1
                     else:
@@ -163,8 +179,8 @@ class Game:
                     else:
                         self.made_decision = tree.making_decision(self.decision_tree, self.distance_to_dump // 40 + 1,
                                                                   self.distance_to_trash // 40 + 1,
-                                                                  self.truck.mass // 20 + 1,
-                                                                  self.truck.space // 20 + 1, self.trash.mass // 20 + 1,
+                                                                  self.truck.mass // 20 + 1, self.truck.space // 20 + 1,
+                                                                  self.trash.mass // 20 + 1,
                                                                   self.trash.space // 20 + 1)
 
                     if self.made_decision[0] == 0:
@@ -183,11 +199,18 @@ class Game:
 
                         pygame.event.clear()
 
+                    else:
+                        print("Decision tree error!\n")
+
                     pygame.event.clear()
 
             if self.truck.x == self.trash.x and self.truck.y == self.trash.y:
                 self.truck.mass += self.trash.mass
                 self.truck.space += self.trash.space
+
+                nn_result = network.result_from_network(self.neural_network, self.trash.image_path)
+                print("Trash type: {0}\nNetwork type: {1})".format(self.trash.type, nn_result))
+
                 self.trash.change_details()
 
             if self.truck.x == self.dump.x and self.truck.y == self.dump.y and self.truck.mass > 0 and self.truck.space > 0:
