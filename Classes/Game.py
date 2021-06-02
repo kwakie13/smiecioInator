@@ -177,11 +177,11 @@ class Game:
                         self.made_decision = []
                         self.made_decision.append(1)
                     else:
-                        self.made_decision = tree.making_decision(self.decision_tree, self.distance_to_dump // 40 + 1,
+                        self.made_decision = tree.making_decision(self.decision_tree,
+                                                                  self.distance_to_dump // 40 + 1,
                                                                   self.distance_to_trash // 40 + 1,
                                                                   self.truck.mass // 20 + 1, self.truck.space // 20 + 1,
-                                                                  self.trash.mass // 20 + 1,
-                                                                  self.trash.space // 20 + 1)
+                                                                  self.trash.mass // 20 + 1, self.trash.space // 20 + 1)
 
                     if self.made_decision[0] == 0:
                         print("Go to dump, free the truck!\n")
