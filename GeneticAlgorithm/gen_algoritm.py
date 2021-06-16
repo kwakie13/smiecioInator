@@ -123,7 +123,7 @@ class GeneticAlgorithm:
 
             last_distance = distance  # last best to keep
 
-    def pick_mate(self, scores):  # pick two high scorers
+    def pick_mate(self, scores):  # pick two high (not always top) scorers
         array = np.array(scores)
         temp = array.argsort()  # sorted indexes
         ranks = np.empty_like(temp)  # same array as temp
@@ -177,7 +177,7 @@ class GeneticAlgorithm:
             index_1 = random.randint(1, 8)
             index_2 = random.randint(1, 8)
 
-        if random.random() > probability:
+        if random.random() < probability:
             new_route[index_1], new_route[index_2] = new_route[index_2], new_route[index_1]
 
         return new_route
