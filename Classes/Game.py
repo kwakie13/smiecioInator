@@ -26,6 +26,7 @@ class Game:
         self.borders = None
         self.houses = None
         self.holes = None
+        self.trashes = None
 
         self.dump = None
         self.trash = None
@@ -41,6 +42,9 @@ class Game:
 
         self.neural_network = None
 
+        self.spawn_coords = None, None
+        self.removed_trash = 0
+
         self.load_data()
 
     def load_data(self):
@@ -54,6 +58,7 @@ class Game:
         self.borders = pygame.sprite.Group()
         self.houses = pygame.sprite.Group()
         self.holes = pygame.sprite.Group()
+        self.trashes = pygame.sprite.Group()
         var_x, var_y = 0, 0
 
         for row, tiles in enumerate(self.map_data):
@@ -67,7 +72,7 @@ class Game:
                 if tile == 'D':
                     self.dump = Dump.Dump(self, col, row)
                 if tile == 'R':
-                    self.trash = Trash.Trash(self, col, row)
+                    Trash.Trash(self, col, row)
                 if tile == 'T':
                     var_x, var_y = col, row
 
@@ -123,15 +128,16 @@ class Game:
                 if event.key == pygame.K_UP:
                     self.truck.move(rotation=self.truck.rotation)
 
-                if event.key == pygame.K_a:  # run A*
-                    self.truck.start_search(self.trash, 1)
-                    self.truck.move_truck()
-                    pygame.event.clear()
+                # A* and BFS disabled - more than 1 trash is on the map
+                # if event.key == pygame.K_a:  # run A*
+                #     self.truck.start_search(self.trash, 1)
+                #     self.truck.move_truck()
+                #     pygame.event.clear()
 
-                if event.key == pygame.K_b:  # run BFS
-                    self.truck.start_search(self.trash, 2)
-                    self.truck.move_truck()
-                    pygame.event.clear()
+                # if event.key == pygame.K_b:  # run BFS
+                #     self.truck.start_search(self.trash, 2)
+                #     self.truck.move_truck()
+                #     pygame.event.clear()
 
                 if event.key == pygame.K_l:  # load machine learning methods
                     # DECISION TREE
@@ -204,14 +210,25 @@ class Game:
 
                     pygame.event.clear()
 
-            if self.truck.x == self.trash.x and self.truck.y == self.trash.y:
-                self.truck.mass += self.trash.mass
-                self.truck.space += self.trash.space
+            for trash in self.trashes:
+                if self.truck.x == trash.x and self.truck.y == trash.y:
+                    self.truck.mass += trash.mass
+                    self.truck.space += trash.space
 
-                nn_result = network.result_from_network(self.neural_network, self.trash.image_path)
-                print("Trash type: {0}\nNetwork type: {1}\n".format(self.trash.type, nn_result))
+                    nn_result = network.result_from_network(self.neural_network, trash.image_path)
+                    print("Trash type: {0}\nNetwork type: {1}\n".format(trash.type, nn_result))
 
-                self.trash.change_details()
+                    trash.change_details()
+
+                    self.spawn_coords = trash.x, trash.y
+                    trash.kill()
+                    self.removed_trash = 1
+
+            if (self.truck.x != self.spawn_coords[0] or self.truck.y != self.spawn_coords[
+                1]) and self.removed_trash == 1:
+                Trash.Trash(self, self.spawn_coords[0], self.spawn_coords[1])
+                self.spawn_coords = None, None
+                self.removed_trash = 0
 
             if self.truck.x == self.dump.x and self.truck.y == self.dump.y and self.truck.mass > 0 and self.truck.space > 0:
                 self.truck.mass = 0

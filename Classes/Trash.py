@@ -8,7 +8,7 @@ from variables import *
 
 class Trash(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
-        self.groups = game.all_sprites
+        self.groups = game.all_sprites, game.trashes
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
 
@@ -26,21 +26,7 @@ class Trash(pygame.sprite.Sprite):
         self.change_details()
 
     def change_details(self):
-        bad_coordinates = True
-
-        rand_x = random.randint(1, 9)
-        rand_y = random.randint(1, 9)
-
-        while bad_coordinates:
-            rand_x = random.randint(1, 9)
-            rand_y = random.randint(1, 9)
-
-            if not self.collision(rand_x, rand_y):
-                bad_coordinates = False
-
-        self.x = rand_x
-        self.y = rand_y
-
+        # self.random_position()
         self.random_type()
         self.random_file()
         self.random_size()
@@ -59,6 +45,22 @@ class Trash(pygame.sprite.Sprite):
                 return True
 
         return False
+
+    def random_position(self):
+        bad_coordinates = True
+
+        rand_x = random.randint(1, 9)
+        rand_y = random.randint(1, 9)
+
+        while bad_coordinates:
+            rand_x = random.randint(1, 9)
+            rand_y = random.randint(1, 9)
+
+            if not self.collision(rand_x, rand_y):
+                bad_coordinates = False
+
+        self.x = rand_x
+        self.y = rand_y
 
     def random_type(self):
         random_num = random.randint(0, 3)
