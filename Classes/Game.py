@@ -7,6 +7,7 @@ import pygame
 
 from Classes import Border, Hole, House, Trash, Truck, Dump
 from DecisionTree import tree
+from GeneticAlgorithm import gen_algoritm
 from NeuralNetwork import network
 from variables import *
 
@@ -44,6 +45,9 @@ class Game:
 
         self.spawn_coords = None, None
         self.removed_trash = 0
+
+        self.genetic_algorithm = None
+        self.route = None
 
         self.load_data()
 
@@ -163,6 +167,12 @@ class Game:
 
                     else:
                         print("Network invalid!\n")
+
+                    # GENETIC ALGORITHM
+                    self.genetic_algorithm = gen_algoritm.GeneticAlgorithm(self)
+                    print("\n", self.genetic_algorithm.best_route, "\n")
+                    self.route = self.genetic_algorithm.best_route
+                    print("Genetic algorithm loaded!\n")
 
                     pygame.event.clear()
 
