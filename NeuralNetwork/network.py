@@ -1,4 +1,5 @@
 import os
+import sys
 from os import path
 
 import torch
@@ -87,6 +88,15 @@ def save_network_to_file(network):
 
 def load_network_from_structure(network):
     network.load_state_dict(torch.load("./NeuralNetwork/network_model.pth"))
+
+
+def save_network_to_txt(network):
+    original_stdout = sys.stdout
+
+    with open("./NeuralNetwork/network_in_txt.txt", "w") as file:
+        sys.stdout = file
+        print(network)
+        sys.stdout = original_stdout
 
 
 def testing_network():
