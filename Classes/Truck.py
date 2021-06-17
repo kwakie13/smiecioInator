@@ -3,6 +3,7 @@ import time
 import pygame as pg
 
 from Classes import Searching
+from NeuralNetwork import network
 from variables import *
 
 
@@ -102,3 +103,24 @@ class Truck(pg.sprite.Sprite):
 
     def truck_image(self, rotation=0):
         self.image = pg.image.load(TRUCK_PICS[rotation])
+
+    def empty_truck(self):
+        if self.game.truck.x == self.game.dump.x and self.game.truck.y == self.game.dump.y and self.game.truck.mass > 0 and self.game.truck.space > 0:
+            self.game.truck.mass = 0
+            self.game.truck.space = 0
+
+    def pickup_trash(self):
+        for trash in self.game.trashes:
+            if self.game.truck.x == trash.x and self.game.truck.y == trash.y:
+                self.game.truck.mass += trash.mass
+                self.game.truck.space += trash.space
+
+                nn_result = network.result_from_network(self.game.neural_network, trash.image_path)
+                print("==NEURAL NETWORK - RECOGNITION==\nTrash type: {0}\nNetwork type: {1}\n".format(trash.type,
+                                                                                                      nn_result))
+
+                trash.change_details()
+
+                self.game.spawn_coords.append([trash.x, trash.y])
+                trash.kill()
+                self.game.removed_trash += 1
