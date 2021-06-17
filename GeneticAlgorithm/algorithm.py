@@ -13,9 +13,8 @@ class GeneticAlgorithm:
     def __init__(self, game):
         self.game = game
         self.trash_list = self.split_trash()
-        self.best_route_np = None
+        self.best_route = None
         self.run()
-        self.best_route = self.best_route_np.tolist()
 
     def split_trash(self):
         trash_list = []
@@ -99,7 +98,7 @@ class GeneticAlgorithm:
         y = [0.5] + [x + 0.5 for x in route[1: len(route)]] + [len(the_map) - 0.5]
 
         plt.plot(x, y, marker="o", linewidth=3, markersize=10, linestyle="-", color="yellow")
-        plt.savefig("./Assets/new_best_plot_%i.png" % iteration_number, dpi=300)
+        plt.savefig("./Assets/Plots/new_best_plot_%i.png" % iteration_number, dpi=300)
         plt.show()
 
     @staticmethod
@@ -181,7 +180,7 @@ class GeneticAlgorithm:
 
             scores = self.score_population(population, the_map)  # score of each element (fitness)
             best = population[np.argmin(scores)]  # best element = least cost
-            self.best_route_np = best
+            self.best_route = best
             number_of_moves = len(best)
             distance = self.fitness(best, the_map)
 
