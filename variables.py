@@ -34,3 +34,5 @@ HOUSE_PICS = {0: './Assets/house_0.png', 1: './Assets/house_1.png', 2: './Assets
 
 REGULAR_COST = 1
 HOLE_COST = 25
+
+TIME_BETWEEN_AUTO_MOVES = 0.1

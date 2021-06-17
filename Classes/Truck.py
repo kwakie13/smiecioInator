@@ -96,7 +96,7 @@ class Truck(pg.sprite.Sprite):
 
             self.update()
             self.game.draw()
-            time.sleep(0.1)
+            time.sleep(TIME_BETWEEN_AUTO_MOVES)
 
         self.move_list = []
 

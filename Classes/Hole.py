@@ -11,7 +11,7 @@ class Hole(pygame.sprite.Sprite):
 
         self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.image = pygame.image.load('./Assets/hole_big.png')
-        self.image = pygame.transform.scale(self.image, (64, 64))
+        self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
 
         self.rect = self.image.get_rect()
         self.x = x

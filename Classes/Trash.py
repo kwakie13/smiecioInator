@@ -26,7 +26,7 @@ class Trash(pygame.sprite.Sprite):
         self.change_details()
 
     def change_details(self):
-        # self.random_position()
+        # self.random_position() - commented as we use static positions for genetic algorithm
         self.random_type()
         self.random_file()
         self.random_size()
@@ -73,7 +73,7 @@ class Trash(pygame.sprite.Sprite):
 
         self.image_path = pics_folder + '/' + selected_file
         self.image = pygame.image.load(self.image_path)
-        self.image = pygame.transform.scale(self.image, (64, 64))
+        self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
 
     def random_size(self):
         self.mass = random.randint(0, 25)
