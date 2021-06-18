@@ -132,7 +132,7 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     self.quit()
 
-                # ===== moving with arrows disables - click G and everithing will happen automatically! =====
+                # ===== moving with arrows disables - click G and everything will happen automatically! =====
                 #
                 # if event.key == pygame.K_LEFT:
                 #     self.truck.rotate(direction=-1)
@@ -200,6 +200,7 @@ class Game:
                         self.truck.move_truck()
                         self.respawn_trashes()
                         self.iterator = 0
+                        pygame.event.clear()
                         continue
 
                     self.get_distance_to_dump()
@@ -261,11 +262,15 @@ class Game:
             self.truck.start_search(self.trash_list[index], 1)
             self.truck.move_truck()
 
+            pygame.event.clear()
+
         elif self.made_decision[0] == 1:
             print("\n==DECISION TREE - DECISION==\nGo to trash, pick it up!\n")
 
             self.truck.start_search(self.trash_list[index], 1)
             self.truck.move_truck()
+
+            pygame.event.clear()
 
         else:
             print("Decision tree error!\n")
