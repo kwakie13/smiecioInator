@@ -52,10 +52,10 @@ class Game:
         self.spawn_coords = []
         self.removed_trash = 0
 
-        self.iter = 0
+        self.iterator = 0
         self.trash_list = list()
 
-        print("\nPress L on your keyboard to load neccessary assets (machine learning methods)\n")
+        print("\nPress L on your keyboard to load necessary assets (machine learning methods)\n")
 
         self.load_data()
 
@@ -98,20 +98,15 @@ class Game:
             self.update()
             self.draw()
 
-    def split_trash(self):
-        trash_list = []
-        for trash in self.trashes:
-            trash_list.append(trash)
-
-        return trash_list
-
-    @staticmethod
-    def quit():
-        pygame.quit()
-        sys.exit()
-
     def update(self):  # update game loop
         self.all_sprites.update()
+
+    def draw(self):
+        self.screen.fill(BG_COLOR)
+        self.draw_grid()
+        self.all_sprites.draw(self.screen)
+        self.draw_missing_borders()
+        pygame.display.flip()
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILE_SIZE):
@@ -123,12 +118,10 @@ class Game:
         pygame.draw.line(self.screen, GREY, (704, 64), (704, 704))
         pygame.draw.line(self.screen, GREY, (64, 704), (704, 704))
 
-    def draw(self):
-        self.screen.fill(BG_COLOR)
-        self.draw_grid()
-        self.all_sprites.draw(self.screen)
-        self.draw_missing_borders()
-        pygame.display.flip()
+    @staticmethod
+    def quit():
+        pygame.quit()
+        sys.exit()
 
     def events(self):
         for event in pygame.event.get():
@@ -139,14 +132,16 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     self.quit()
 
-                if event.key == pygame.K_LEFT:
-                    self.truck.rotate(direction=-1)
-
-                if event.key == pygame.K_RIGHT:
-                    self.truck.rotate(direction=1)
-
-                if event.key == pygame.K_UP:
-                    self.truck.move(rotation=self.truck.rotation)
+                # ===== moving with arrows disables - click G and everithing will happen automatically! =====
+                #
+                # if event.key == pygame.K_LEFT:
+                #     self.truck.rotate(direction=-1)
+                #
+                # if event.key == pygame.K_RIGHT:
+                #     self.truck.rotate(direction=1)
+                #
+                # if event.key == pygame.K_UP:
+                #     self.truck.move(rotation=self.truck.rotation)
 
                 # ===== A* and BFS disabled - more than 1 trash is on the map =====
                 #
@@ -169,6 +164,7 @@ class Game:
 
                     else:
                         print("Problem with loading decision tree!")
+                        self.quit()
 
                     # NEURAL NETWORK
                     if path.isfile('./NeuralNetwork/network_model.pth') and not os.stat(
@@ -180,6 +176,7 @@ class Game:
 
                     else:
                         print("Problem with loading neural network!")
+                        self.quit()
 
                     # GENETIC ALGORITHM
                     if path.isfile('./GeneticAlgorithm/algorithm_model.npy') and not os.stat(
@@ -189,66 +186,36 @@ class Game:
 
                     else:
                         print("Problem with loading genetic algorithm result!")
+                        self.quit()
 
                     print("")
 
                     pygame.event.clear()
 
                 if event.key == pygame.K_g:
-                    element = self.iter
+                    element = self.iterator
+
+                    if self.removed_trash == 10:
+                        self.truck.start_search(self.dump, 1)
+                        self.truck.move_truck()
+                        self.respawn_trashes()
+                        self.iterator = 0
+                        continue
 
                     self.get_distance_to_dump()
                     self.get_distance_to_trash(element)
 
                     self.print_information(element)
 
-                    if self.distance_to_dump == 1:
-                        self.made_decision = [1]
+                    self.making_decision(element)
 
-                    elif self.removed_trash == 10:
-                        self.made_decision = [0]
-
-                    else:
-                        self.made_decision = tree.making_decision(self.decision_tree,
-                                                                  self.distance_to_dump // 40 + 1,
-                                                                  self.distance_to_trash // 40 + 1,
-                                                                  self.truck.mass // 20 + 1, self.truck.space // 20 + 1,
-                                                                  self.trash_list[element].mass // 20 + 1,
-                                                                  self.trash_list[element].space // 20 + 1)
-
-                    if self.made_decision[0] == 0:
-                        print("\n==DECISION TREE - DECISION==\nGo to dump, free the truck!\n")
-
-                        self.truck.start_search(self.dump, 1)
-                        self.truck.move_truck()
-
-                        self.truck.empty_truck()
-
-                        self.truck.start_search(self.trash_list[element], 1)
-                        self.truck.move_truck()
-
-                        pygame.event.clear()
-
-                    elif self.made_decision[0] == 1:
-                        print("\n==DECISION TREE - DECISION==\nGo to trash, pick it up!\n")
-
-                        self.truck.start_search(self.trash_list[element], 1)
-                        self.truck.move_truck()
-
-                        pygame.event.clear()
-
-                    else:
-                        print("Decision tree error!\n")
-
-                    self.iter += 1
+                    self.iterator += 1
 
                 pygame.event.clear()
 
             self.truck.pickup_trash()
 
             self.truck.empty_truck()
-
-            self.respawn_trashes()
 
     def get_distance_to_dump(self):
         if self.truck.x == self.dump.x and self.truck.y == self.dump.y:
@@ -265,6 +232,47 @@ class Game:
               "\nTruck filled (mass): {0}\nTruck filled (space): {1}".format(self.truck.mass, self.truck.space),
               "\nTrash mass: {0}\nTrash volume: {1}".format(self.trash_list[index].mass, self.trash_list[index].space))
 
+    def making_decision(self, index):
+        if self.distance_to_dump == 1:
+            self.made_decision = [1]
+
+        elif self.removed_trash == 10:
+            self.made_decision = [0]
+
+        else:
+            self.made_decision = tree.making_decision(self.decision_tree,
+                                                      self.distance_to_dump // 40 + 1,
+                                                      self.distance_to_trash // 40 + 1,
+                                                      self.truck.mass // 20 + 1, self.truck.space // 20 + 1,
+                                                      self.trash_list[index].mass // 20 + 1,
+                                                      self.trash_list[index].space // 20 + 1)
+
+        self.decision_based_actions(index)
+
+    def decision_based_actions(self, index):
+        if self.made_decision[0] == 0:
+            print("\n==DECISION TREE - DECISION==\nGo to dump, free the truck!\n")
+
+            self.truck.start_search(self.dump, 1)
+            self.truck.move_truck()
+
+            self.truck.empty_truck()
+
+            self.truck.start_search(self.trash_list[index], 1)
+            self.truck.move_truck()
+
+        elif self.made_decision[0] == 1:
+            print("\n==DECISION TREE - DECISION==\nGo to trash, pick it up!\n")
+
+            self.truck.start_search(self.trash_list[index], 1)
+            self.truck.move_truck()
+
+        else:
+            print("Decision tree error!\n")
+            self.quit()
+
+        pygame.event.clear()
+
     def respawn_trashes(self):
         if self.removed_trash == 10 and len(self.spawn_coords) == 10 and (
                 self.spawn_coords[9][0] != self.truck.x or self.spawn_coords[9][1] != self.truck.y):
@@ -273,3 +281,12 @@ class Game:
 
             self.spawn_coords = []
             self.removed_trash = 0
+
+            self.trash_list = self.split_trash()
+
+    def split_trash(self):
+        trash_list = []
+        for trash in self.trashes:
+            trash_list.append(trash)
+
+        return trash_list
