@@ -87,7 +87,7 @@ def save_network_to_file(network):
 
 
 def load_network_from_structure(network):
-    network.load_state_dict(torch.load("./NeuralNetwork/network_model.pth"))
+    network.load_state_dict(torch.load("./NeuralNetwork/network_model.pth", map_location=torch.device('cpu')))
 
 
 def save_network_to_txt(network):
